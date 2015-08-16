@@ -55,7 +55,7 @@ public class GLMTest  extends TestUtil {
       params._train = fr._key;
       // params._response = 1;
       params._response_column = fr._names[1];
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
 //      params._standardize= false;
       job = new GLM(modelKey, "glm test simple gaussian", params);
       job.trainModel().get();
@@ -99,7 +99,7 @@ public class GLMTest  extends TestUtil {
       params._train = fr._key;
       // params._response = 1;
       params._response_column = fr._names[1];
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._standardize = false;
       job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
@@ -117,7 +117,7 @@ public class GLMTest  extends TestUtil {
       params2._train = fr._key;
       // params2._response = 1;
       params2._response_column = fr._names[1];
-      params2._lambda = new double[]{0};
+      params2.setTheLambda(0);
       params2._standardize = false;
       params2._beta_epsilon = 1e-5;
       job = new GLM(modelKey, "glm test simple poisson", params2);
@@ -163,7 +163,7 @@ public class GLMTest  extends TestUtil {
       // params._response = 1;
       params._response_column = fr._names[1];
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       Key modelKey = Key.make("gamma_test");
       job = new GLM(modelKey, "glm test simple gamma", params);
       job.trainModel().get();
@@ -221,10 +221,10 @@ public class GLMTest  extends TestUtil {
     double ymu = 0;
     try {
       fr = parse_test_file(parsed, "smalldata/junit/mixcat_train.csv");
-      GLMParameters params = new GLMParameters(Family.binomial, Family.binomial.defaultLink, new double[]{0}, new double[]{0}, 0, 0);
+      GLMParameters params = new GLMParameters(Family.binomial, Family.binomial.defaultLink, 0 ,0, 0, 0);
       // params._response = fr.find(params._response_column);
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._use_all_factor_levels = true;
       fr.add("Useless", fr.remove("Useless"));
 
@@ -267,7 +267,7 @@ public class GLMTest  extends TestUtil {
       // params._response = 1;
       params._response_column = fr._names[1];
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       Key modelKey = Key.make("gamma_test");
       GLM job = new GLM(modelKey, "glm test simple gamma", params);
       job.trainModel().get();
@@ -286,10 +286,10 @@ public class GLMTest  extends TestUtil {
     DataInfo dinfo = null;
     try {
       fr = parse_test_file(parsed, "smalldata/junit/mixcat_train.csv");
-      GLMParameters params = new GLMParameters(Family.binomial, Family.binomial.defaultLink, new double[]{0}, new double[]{0}, 0, 0);
+      GLMParameters params = new GLMParameters(Family.binomial, Family.binomial.defaultLink, 0, 0, 0, 0);
       // params._response = fr.find(params._response_column);
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._use_all_factor_levels = true;
       fr.add("Useless", fr.remove("Useless"));
 
@@ -300,14 +300,14 @@ public class GLMTest  extends TestUtil {
       for (int i = 0; i < beta.length; ++i)
         beta[i] = 1 - 2 * rnd.nextDouble();
 
-      GLMGradientTask grtCol = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
-      GLMGradientTask grtRow = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
-      LBFGS_LogisticGradientTask logistic = (LBFGS_LogisticGradientTask) new LBFGS_LogisticGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
+      GLMGradientTask grtCol = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
+      GLMGradientTask grtRow = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
+      LBFGS_LogisticGradientTask logistic = (LBFGS_LogisticGradientTask) new LBFGS_LogisticGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
       for (int i = 0; i < beta.length; ++i) {
         assertEquals("gradients differ", grtRow._gradient[i], grtCol._gradient[i], 1e-4);
         assertEquals("gradients differ", grtRow._gradient[i], logistic._gradient[i], 1e-4);
       }
-      params = new GLMParameters(Family.gaussian, Family.gaussian.defaultLink, new double[]{0}, new double[]{0}, 0, 0);
+      params = new GLMParameters(Family.gaussian, Family.gaussian.defaultLink, 0, 0, 0, 0);
       params._use_all_factor_levels = false;
       dinfo.remove();
       dinfo = new DataInfo(Key.make(), fr, null, 1, params._use_all_factor_levels || params._lambda_search, params._standardize ? DataInfo.TransformType.STANDARDIZE : DataInfo.TransformType.NONE, DataInfo.TransformType.NONE, true, false, false, false, false, false);
@@ -316,17 +316,17 @@ public class GLMTest  extends TestUtil {
       rnd = new Random(1987654321);
       for (int i = 0; i < beta.length; ++i)
         beta[i] = 1 - 2 * rnd.nextDouble();
-      grtCol = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
-      grtRow = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
+      grtCol = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
+      grtRow = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
 
       for (int i = 0; i < beta.length; ++i)
         assertEquals("gradients differ: " + Arrays.toString(grtRow._gradient) + " != " + Arrays.toString(grtCol._gradient), grtRow._gradient[i], grtCol._gradient[i], 1e-4);
       dinfo.remove();
       fr = parse_test_file(parsed, "smalldata/junit/cars.csv");
-      params = new GLMParameters(Family.poisson, Family.poisson.defaultLink, new double[]{0}, new double[]{0},0,0);
+      params = new GLMParameters(Family.poisson, Family.poisson.defaultLink, 0,0,0,0);
       // params._response = fr.find(params._response_column);
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._use_all_factor_levels = true;
       dinfo = new DataInfo(Key.make(), fr, null, 1, params._use_all_factor_levels || params._lambda_search, params._standardize ? DataInfo.TransformType.STANDARDIZE : DataInfo.TransformType.NONE, DataInfo.TransformType.NONE, true, false, false, false, false, false);
       DKV.put(dinfo._key,dinfo);
@@ -335,8 +335,8 @@ public class GLMTest  extends TestUtil {
       for (int i = 0; i < beta.length; ++i)
         beta[i] = 1 - 2 * rnd.nextDouble();
 
-      grtCol = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
-      grtRow = new GLMGradientTask(dinfo, params, params._lambda[0], beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
+      grtCol = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceColAccess().doAll(dinfo._adaptedFrame);
+      grtRow = new GLMGradientTask(dinfo, params, params.getTheLambda(), beta, 1, null).forceRowAccess().doAll(dinfo._adaptedFrame);
       for (int i = 0; i < beta.length; ++i)
         assertEquals("gradients differ: " + Arrays.toString(grtRow._gradient) + " != " + Arrays.toString(grtCol._gradient), grtRow._gradient[i], grtCol._gradient[i], 1e-4);
       dinfo.remove();
@@ -366,13 +366,13 @@ public class GLMTest  extends TestUtil {
     Frame score = null;
     try {
       fr = parse_test_file(parsed, "smalldata/junit/cars.csv");
-      GLMParameters params = new GLMParameters(Family.poisson, Family.poisson.defaultLink, new double[]{0}, new double[]{0},0,0);
+      GLMParameters params = new GLMParameters(Family.poisson, Family.poisson.defaultLink, 0,0,0,0);
       params._response_column = "power (hp)";
       // params._response = fr.find(params._response_column);
       params._ignored_columns = new String[]{"name"};
       params._train = parsed;
-      params._lambda = new double[]{0};
-      params._alpha = new double[]{0};
+      params.setTheLambda(0);
+      params.setTheAlpha(0);
       job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
       model = DKV.get(modelKey).get();
@@ -388,12 +388,12 @@ public class GLMTest  extends TestUtil {
       model.delete();
       job.remove();
 
-      params = new GLMParameters(Family.gamma, Family.gamma.defaultLink, new double[]{0}, new double[]{0},0,0);
+      params = new GLMParameters(Family.gamma, Family.gamma.defaultLink, 0,0,0,0);
       params._response_column = "power (hp)";
       // params._response = fr.find(params._response_column);
       params._ignored_columns = new String[]{"name"};
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._beta_epsilon = 1e-5;
       job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
@@ -411,7 +411,7 @@ public class GLMTest  extends TestUtil {
       // params._response = fr.find(params._response_column);
       params._ignored_columns = new String[]{"name"};
       params._train = parsed;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
       model = DKV.get(modelKey).get();
@@ -514,8 +514,8 @@ public class GLMTest  extends TestUtil {
       params._response_column = "CAPSULE";
       params._ignored_columns = new String[]{"ID"};
       params._train = fr._key;
-      params._alpha = new double[]{1};
-      params._lambda = new double[]{0.001607};
+      params.setTheAlpha(1);
+      params.setTheLambda(0.001607);
       GLM job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
       assertTrue(job.isDone());
@@ -528,8 +528,8 @@ public class GLMTest  extends TestUtil {
       // 388.4952716196743
       assertEquals(388.4686, val._resDev, 1e-1);
       model.delete();
-      params._lambda = new double[]{0};
-      params._alpha = new double[]{0};
+      params.setTheLambda(0);
+      params.setTheAlpha(0);
       FVecTest.makeByteVec(betaConsKey, "names, lower_bounds, upper_bounds\n RACE, -.5, .5\n DCAPS, -.4, .4\n DPROS, -.5, .5 \nPSA, -.5, .5\n VOL, -.5, .5");
       betaConstraints = ParseDataset.parse(Key.make("beta_constraints.hex"), betaConsKey);
       job = new GLM(modelKey, "glm test simple poisson", params);
@@ -597,8 +597,8 @@ public class GLMTest  extends TestUtil {
       params._response_column = "CAPSULE";
       params._ignored_columns = new String[]{"ID"};
       params._train = fr._key;
-      params._alpha = new double[]{0};
-      params._lambda = new double[]{0};
+      params.setTheAlpha(0);
+      params.setTheLambda(0);
       GLM job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
       model = DKV.get(modelKey).get();
@@ -861,7 +861,7 @@ public class GLMTest  extends TestUtil {
       params._response_column = "IsDepDelayed";
       params._ignored_columns = ignoredCols;
       params._train = fr._key;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._standardize = false;
       job = new GLM(Key.make("airlines_cat_nostd"), "Airlines with auto-expanded categoricals, no standardization", params);
       model1 = job.trainModel().get();
@@ -1153,7 +1153,7 @@ public class GLMTest  extends TestUtil {
       params._response_column = "CAPSULE";
       params._ignored_columns = new String[]{"ID"};
       params._train = fr._key;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._standardize = false;
       job = new GLM(Key.make("prostate_model"),"glm test simple poisson",params);
       model = job.trainModel().get();
@@ -1190,9 +1190,8 @@ public class GLMTest  extends TestUtil {
       assertEquals(model.beta()[model.beta().length-1] -Math.log(model._ymu * (1-prior)/(prior * (1-model._ymu))),model2.beta()[model.beta().length-1],1e-10);
 
       // run with lambda search, check the final submodel
-      params._lambda_search = true;
-      params._lambda = null;
-      params._alpha = new double[]{0};
+      params.setLambdaSearch(true);
+      params.setTheAlpha(0);
       params._prior = -1;
       params._max_iterations = 500;
       job.remove();
@@ -1201,7 +1200,7 @@ public class GLMTest  extends TestUtil {
       model3 = job.trainModel().get();
       double lambda =  model3._output._submodels[model3._output._best_lambda_idx].lambda_value;
       params._lambda_search = false;
-      params._lambda = new double[]{lambda};
+      params.setTheLambda(lambda);
       job.remove();
       ModelMetrics mm3 = ModelMetrics.getFromDKV(model3,fr);
       assertEquals("mse don't match, " + model3._output._training_metrics._MSE + " != " + mm3._MSE,model3._output._training_metrics._MSE,mm3._MSE,1e-8);
@@ -1255,7 +1254,7 @@ public class GLMTest  extends TestUtil {
       // params._response = fr.find(params._response_column);
       params._ignored_columns = new String[]{"ID"};
       params._train = fr._key;
-      params._lambda = new double[]{0};
+      params.setTheLambda(0);
       params._standardize = false;
       params._max_iterations = 20;
       job = new GLM(Key.make("glm_model"), "glm test simple poisson", params);
@@ -1291,7 +1290,7 @@ public class GLMTest  extends TestUtil {
       params._response_column = "bikes";
       params._train = tfr._key;
       params._valid = vfr._key;
-      params._lambda = new double[]{1e-5};
+      params.setTheLambda(1e-5);
       job = new GLM(Key.make("glm_model"), "glm test PUBDEV-1839", params);
       model = job.trainModel().get();
 
@@ -1326,7 +1325,7 @@ public class GLMTest  extends TestUtil {
       params._solver = Solver.L_BFGS;
       params._response_column = fr._names[0];
       params._train = parsed;
-      params._alpha = new double[]{0};
+      params.setTheAlpha(0);
 
       job = new GLM(modelKey, "glm test simple poisson", params);
       job.trainModel().get();
@@ -1334,15 +1333,14 @@ public class GLMTest  extends TestUtil {
       model.delete();
       params = new GLMParameters(Family.gaussian);
       // params._response = 0;
-      params._lambda = null;
+      params.setLambdaSearch(true);
       params._response_column = fr._names[0];
       params._train = parsed;
-      params._lambda_search = true;
       params._nlambdas = 35;
       params._lambda_min_ratio = 0.18;
       params._max_iterations = 100000;
       params._max_active_predictors = 215;
-      params._alpha = new double[]{1};
+      params.setTheAlpha(1);
       for(Solver s: new Solver[]{/*Solver.L_BFGS,*/ Solver.IRLSM}) { // LBFGS lambda-search is too slow now
         params._solver = s;
         job = new GLM(modelKey, "glm test simple poisson", params);
@@ -1357,14 +1355,13 @@ public class GLMTest  extends TestUtil {
       // test behavior when we can not fit within the active cols limit (should just bail out early and give us whatever it got)
       params = new GLMParameters(Family.gaussian);
       // params._response = 0;
-      params._lambda = null;
+      params.setLambdaSearch(true);
       params._response_column = fr._names[0];
       params._train = parsed;
-      params._lambda_search = true;
       params._nlambdas = 35;
       params._lambda_min_ratio = 0.18;
       params._max_active_predictors = 20;
-      params._alpha = new double[]{1};
+      params.setTheAlpha(1);
       job = new GLM(modelKey,"glm test simple poisson",params);
       job.trainModel().get();
       model = DKV.get(modelKey).get();

@@ -62,7 +62,7 @@ public class GLMBasic extends TestNGUtil {
         if     (irlsm.equals("x")) { params._solver = Solver.IRLSM; }
         else if(lbfgs.equals("x")) { params._solver = Solver.L_BFGS; }
         params._lambda = lambda.equals("") ? null : new double[]{ Double.parseDouble(lambda)};
-        params._alpha = alpha.equals("") ? null : new double[]{ Double.parseDouble(alpha)};
+        params.setTheAlpha(alpha.equals("") ? GLMParameters.DEFAULT_ALPHA : Double.parseDouble(alpha));
         params._standardize = standardize.equals("x");
         params._lambda_search = lambdaSearch.equals("x");
         params._use_all_factor_levels = useAllFactorLevels.equals("x");

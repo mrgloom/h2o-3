@@ -126,7 +126,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._valid = fKeyTest;
     params._offset_column = "offset";
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._objective_epsilon = 0;
     params._gradient_epsilon = 1e-6;
@@ -324,7 +324,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._valid = fKeyTest;
     params._offset_column = "offset";
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._objective_epsilon = 0;
     params._gradient_epsilon = 1e-6;
@@ -418,7 +418,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._train = _prostateTrain._key;
     params._valid = _prostateTest._key;
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._intercept = false;
     params._objective_epsilon = 0;
@@ -555,7 +555,7 @@ public class GLMBasicTestBinomial extends TestUtil {
 //    params._valid = fKeyTest;
     params._weights_column = "weights";
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     //params._standardize = false;
     params._objective_epsilon = 0;
     params._gradient_epsilon = 1e-6;
@@ -672,7 +672,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._ignored_columns = new String[]{"ID",};
     params._train = _prostateTrain._key;
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._non_negative = true;
     params._intercept = true;
@@ -727,7 +727,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._ignored_columns = new String[]{"ID",};
     params._train = _prostateTrain._key;
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._non_negative = true;
     params._intercept = false;
@@ -895,7 +895,7 @@ public class GLMBasicTestBinomial extends TestUtil {
     params._offset_column = "offset";
     params._weights_column = "weights";
     params._lambda = new double[]{0};
-    params._alpha = new double[]{0};
+    params.setTheAlpha(0);
     params._standardize = false;
     params._objective_epsilon = 0;
     params._gradient_epsilon = 1e-6;

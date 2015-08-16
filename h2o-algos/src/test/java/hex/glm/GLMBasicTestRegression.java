@@ -84,7 +84,7 @@ public class GLMBasicTestRegression extends TestUtil {
       System.out.println("===============================================================");
       try {
         parms._lambda = null;
-        parms._alpha = null;
+        parms.setTheAlpha(GLMParameters.DEFAULT_ALPHA);
         parms._train = _weighted._key;
         parms._solver = s;
         parms._weights_column = "weights";
@@ -95,7 +95,7 @@ public class GLMBasicTestRegression extends TestUtil {
         parms._train = _upsampled._key;
         parms._weights_column = null;
         parms._lambda = null;
-        parms._alpha = null;
+        parms.setTheAlpha(GLMParameters.DEFAULT_ALPHA);
         job2 = new GLM(Key.make("prostate_model"), "glm test", parms);
         model2 = job2.trainModel().get();
         HashMap<String, Double> coefs2 = model2.coefficients();
@@ -203,7 +203,7 @@ public class GLMBasicTestRegression extends TestUtil {
     parms._response_column = "Infections";
     parms._standardize = false;
     parms._lambda = new double[]{0};
-    parms._alpha = new double[]{0};
+    parms.setTheAlpha(0);
     parms._objective_epsilon = 0;
     parms._gradient_epsilon = 1e-10;
     parms._max_iterations = 1000;
@@ -264,7 +264,7 @@ public class GLMBasicTestRegression extends TestUtil {
       parms._offset_column = "logInsured";
       parms._standardize = false;
       parms._lambda = new double[]{0};
-      parms._alpha = new double[]{0};
+      parms.setTheAlpha(0);
       parms._objective_epsilon = 0;
       parms._gradient_epsilon = 1e-10;
       parms._max_iterations = 1000;

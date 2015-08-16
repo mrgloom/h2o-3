@@ -4,6 +4,7 @@ import hex.*;
 import hex.DataInfo.TransformType;
 import hex.glm.GLMModel.GLMParameters.Family;
 import water.*;
+import water.exceptions.H2OMustNotHappenException;
 import water.fvec.Chunk;
 import water.fvec.Frame;
 import water.fvec.Vec;
@@ -67,6 +68,8 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
   }
 
   public static class GLMParameters extends Model.Parameters {
+    public static final double DEFAULT_ALPHA = -1;
+
     // public int _response; // TODO: the standard is now _response_column in SupervisedModel.SupervisedParameters
     public boolean _standardize = true;
     public Family _family;
@@ -88,6 +91,48 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     public double _beta_epsilon = 1e-4;
     public double _objective_epsilon = 1e-5;
     public double _gradient_epsilon = 1e-4;
+
+    public boolean isDefaultAlpha() {
+      if (_alpha == null) return true;
+      if ((_alpha.length == 1) && (_alpha[0] == DEFAULT_ALPHA)) return true;
+      return false;
+    }
+
+    public double getTheAlpha() {
+      return _alpha[0];
+    }
+
+    public boolean haveOneLambda() {
+      return (_lambda != null) && (_lambda.length == 1);
+    }
+
+    public double getTheLambda() {
+      return _lambda[0];
+    }
+
+    public GLMParameters setTheAlpha(double v) {
+      if (v == DEFAULT_ALPHA) {
+        _alpha = null;
+      }
+      else {
+        _alpha = new double[1];
+        _alpha[0] = v;
+      }
+
+      return this;
+    }
+
+    public GLMParameters setTheLambda(double v) {
+      _lambda = new double[1];
+      _lambda[0] = v;
+      return this;
+    }
+
+    public GLMParameters setLambdaSearch(boolean v) {
+      _lambda_search = v;
+      _lambda = null;
+      return this;
+    }
 
     public Key<Frame> _beta_constraints = null;
     // internal parameter, handle with care. GLM will stop when there is more than this number of active predictors (after strong rule screening)
@@ -179,6 +224,15 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     }
     public GLMParameters(Family f){this(f,f.defaultLink);}
     public GLMParameters(Family f, Link l){this(f,l, null, null, 0, 1);}
+
+    public GLMParameters(Family f, Link l, double lambda, double alpha, double twVar, double twLnk) {
+      this.setTheLambda(lambda);
+      this.setTheAlpha(alpha);
+      this._tweedie_variance_power = twVar;
+      this._tweedie_link_power = twLnk;
+      _family = f;
+      _link = l;
+    }
 
     public GLMParameters(Family f, Link l, double [] lambda, double [] alpha, double twVar, double twLnk){
       this._lambda = lambda;
@@ -563,17 +617,39 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     _output._model_summary = new TwoDimTable("GLM Model", "summary", new String[]{""}, names, types, formats, "");
     _output._model_summary.set(0, 0, _parms._family.toString());
     _output._model_summary.set(0, 1, _parms._link.toString());
+
     String regularization = "None";
-    if (_parms._lambda != null && !(_parms._lambda.length == 1 && _parms._lambda[0] == 0)) { // have regularization
-      if (_parms._alpha[0] == 0)
-        regularization = "Ridge ( lambda = ";
-      else if (_parms._alpha[0] == 1)
-        regularization = "Lasso (lambda = ";
-      else
-        regularization = "Elastic Net (alpha = " + MathUtils.roundToNDigits(_parms._alpha[0], 4) + ", lambda = ";
-      regularization = regularization + MathUtils.roundToNDigits(_parms._lambda[_output._best_lambda_idx], 4) + " )";
+    if (_parms.haveOneLambda()) {
+      if (_parms.getTheLambda() != 0) {
+        if (_parms.getTheAlpha() == 0)
+          regularization = "Ridge (lambda = ";
+        else if (_parms.getTheAlpha() == 1)
+          regularization = "Lasso (lambda = ";
+        else
+          regularization = "Elastic Net (alpha = " + MathUtils.roundToNDigits(_parms.getTheAlpha(), 4) + ", lambda = ";
+
+        if (_output._best_lambda_idx != 0) {
+          // This can't happen because we checked that we only have one lambda above.
+          // So best lambda must be slot 0.
+          throw new H2OMustNotHappenException("_best_lambda_idx != 0 (was " + _output._best_lambda_idx + ")");
+        }
+
+        regularization = regularization + MathUtils.roundToNDigits(_parms.getTheLambda(), 4) + ")";
+      }
     }
     _output._model_summary.set(0, 2, regularization);
+
+//    if (_parms._lambda != null && !(_parms._lambda.length == 1 && _parms._lambda[0] == 0)) { // have regularization
+//      if (_parms._alpha[0] == 0)
+//        regularization = "Ridge ( lambda = ";
+//      else if (_parms._alpha[0] == 1)
+//        regularization = "Lasso (lambda = ";
+//      else
+//        regularization = "Elastic Net (alpha = " + MathUtils.roundToNDigits(_parms._alpha[0], 4) + ", lambda = ";
+//      regularization = regularization + MathUtils.roundToNDigits(_parms._lambda[_output._best_lambda_idx], 4) + " )";
+//    }
+//    _output._model_summary.set(0, 2, regularization);
+
     int lambdaSearch = 0;
     if (_parms._lambda_search) {
       lambdaSearch = 1;
@@ -601,8 +677,8 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     if(coefficients.length != predictors.length+1)
       throw new IllegalArgumentException("coefficients length is expected to be predictros.length + 1, as each coefficient must have name + intercept term with no name.");
     GLMParameters parms = new GLMParameters(Family.binomial);
-    parms._alpha = new double[]{0};
-    parms._lambda = new double[]{0};
+    parms.setTheAlpha(0);
+    parms.setTheLambda(0);
     parms._standardize = false;
     parms._prior = -1;
     parms._train = null;

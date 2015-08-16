@@ -71,7 +71,7 @@ public class L_BFGS_Test  extends TestUtil {
     DataInfo dinfo = null;
     try {
       GLMParameters glmp = new GLMParameters(Family.binomial, Family.binomial.defaultLink);
-      glmp._alpha = new double[]{0};
+      glmp.setTheAlpha(0);
       glmp._lambda = new double[]{1e-5};
       Frame source = parse_test_file(parsedKey, "smalldata/glm_test/prostate_cat_replaced.csv");
       source.add("CAPSULE", source.remove("CAPSULE"));
@@ -113,7 +113,7 @@ public class L_BFGS_Test  extends TestUtil {
       Frame valid = new Frame(source._names.clone(),source.vecs().clone());
       GLMParameters glmp = new GLMParameters(Family.gaussian);
       glmp._lambda = new double[]{1e-5};
-      glmp._alpha = new double[]{0};
+      glmp.setTheAlpha(0);
       dinfo = new DataInfo(Key.make(),source, valid, 1, false, DataInfo.TransformType.STANDARDIZE, DataInfo.TransformType.NONE, true, false, false, /* weights */ false, /* offset */ false, /* fold */ false);
       DKV.put(dinfo._key,dinfo);
       GradientSolver solver = new GLMGradientSolver(glmp, dinfo, 1e-5,source.lastVec().mean(), source.numRows());
