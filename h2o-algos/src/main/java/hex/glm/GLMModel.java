@@ -77,7 +77,7 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     public Solver _solver = Solver.IRLSM;
     public double _tweedie_variance_power;
     public double _tweedie_link_power;
-    public double [] _alpha = null;
+    public double _alpha = DEFAULT_ALPHA;
     public double [] _lambda = null;
     public double _prior = -1;
     public boolean _lambda_search = false;
@@ -93,13 +93,11 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     public double _gradient_epsilon = 1e-4;
 
     public boolean isDefaultAlpha() {
-      if (_alpha == null) return true;
-      if ((_alpha.length == 1) && (_alpha[0] == DEFAULT_ALPHA)) return true;
-      return false;
+      return _alpha < 0;
     }
 
     public double getTheAlpha() {
-      return _alpha[0];
+      return _alpha;
     }
 
     public boolean haveOneLambda() {
@@ -111,14 +109,7 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
     }
 
     public GLMParameters setTheAlpha(double v) {
-      if (v == DEFAULT_ALPHA) {
-        _alpha = null;
-      }
-      else {
-        _alpha = new double[1];
-        _alpha[0] = v;
-      }
-
+      _alpha = v;
       return this;
     }
 
@@ -222,8 +213,10 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
       this(Family.gaussian, Link.family_default);
       assert _link == Link.family_default;
     }
+
     public GLMParameters(Family f){this(f,f.defaultLink);}
-    public GLMParameters(Family f, Link l){this(f,l, null, null, 0, 1);}
+
+    public GLMParameters(Family f, Link l){this(f, l, null, DEFAULT_ALPHA, 0, 1);}
 
     public GLMParameters(Family f, Link l, double lambda, double alpha, double twVar, double twLnk) {
       this.setTheLambda(lambda);
@@ -234,7 +227,7 @@ public class GLMModel extends Model<GLMModel,GLMModel.GLMParameters,GLMModel.GLM
       _link = l;
     }
 
-    public GLMParameters(Family f, Link l, double [] lambda, double [] alpha, double twVar, double twLnk){
+    public GLMParameters(Family f, Link l, double [] lambda, double alpha, double twVar, double twLnk){
       this._lambda = lambda;
       this._alpha = alpha;
       this._tweedie_variance_power = twVar;

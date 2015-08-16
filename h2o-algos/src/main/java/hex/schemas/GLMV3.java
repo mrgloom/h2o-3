@@ -72,9 +72,9 @@ public class GLMV3 extends ModelBuilderSchema<GLM,GLMV3,GLMV3.GLMParametersV3> {
     public Solver solver;
 
     @API(help = "distribution of regularization between L1 and L2.", level = Level.critical, gridable = true)
-    public double[] alpha;
+    public double alpha;
 
-    @API(help = "regularization strength", required = false, level = Level.critical, gridable = true)
+    @API(help = "regularization strength", required = false, level = Level.critical)
     public double[] lambda;
 
     @API(help = "use lambda search starting at lambda max, given lambda is then interpreted as lambda min", level = Level.critical)
