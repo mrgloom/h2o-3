@@ -1,5 +1,7 @@
 package water;
 
+import com.google.common.base.Charsets;
+
 import water.util.Log;
 import water.util.TwoDimTable;
 
@@ -1229,7 +1231,7 @@ public /* final */ class AutoBuffer {
     return this;
   }
 
-  @SuppressWarnings("unused")  AutoBuffer putAA1( byte[][] ary ) {
+  public AutoBuffer putAA1( byte[][] ary ) {
     //_arys++;
     long xy = putZA(ary);
     if( xy == -1 ) return this;
@@ -1314,11 +1316,7 @@ public /* final */ class AutoBuffer {
   // Put a String as bytes (not chars!)
   public AutoBuffer putStr( String s ) {
     if( s==null ) return putInt(-1);
-    // Use the explicit getBytes instead of the default no-arg one, to avoid
-    // the overhead of going in an out of a charset decoder.
-    byte[] buf = MemoryManager.malloc1(s.length());
-    s.getBytes(0,buf.length,buf,0);
-    return putA1(buf);
+    return putA1(s.getBytes());
   }
 
   @SuppressWarnings("unused")  public AutoBuffer putEnum( Enum x ) {
